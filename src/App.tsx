@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 
+import CalendarTab from './components/CalendarTab'
 import { useAppStore } from './store'
 import type { AppTab } from './types'
 
@@ -151,19 +152,23 @@ function App() {
           </div>
         </header>
 
-        <section className="orbit-card rounded-[28px] border p-6">
-          <p className="orbit-muted max-w-2xl text-base">{tabCopy[activeTab].body}</p>
+        {activeTab === 'calendar' ? (
+          <CalendarTab />
+        ) : (
+          <section className="orbit-card rounded-[28px] border p-6">
+            <p className="orbit-muted max-w-2xl text-base">{tabCopy[activeTab].body}</p>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="orbit-card rounded-2xl border p-4">
-                <div className="orbit-action-button mb-3 h-2.5 w-16 rounded-full opacity-90" />
-                <div className="h-4 w-3/4 rounded-full bg-[color:var(--color-bg-hover)]" />
-                <div className="mt-3 h-4 w-1/2 rounded-full bg-[color:var(--color-bg-pressed)]" />
-              </div>
-            ))}
-          </div>
-        </section>
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {[1, 2, 3].map((item) => (
+                <div key={item} className="orbit-card rounded-2xl border p-4">
+                  <div className="orbit-action-button mb-3 h-2.5 w-16 rounded-full opacity-90" />
+                  <div className="h-4 w-3/4 rounded-full bg-[color:var(--color-bg-hover)]" />
+                  <div className="mt-3 h-4 w-1/2 rounded-full bg-[color:var(--color-bg-pressed)]" />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   )

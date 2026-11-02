@@ -141,3 +141,66 @@ button,
 button {
   cursor: pointer;
 }
+
+.orbit-calendar-shell {
+  overflow: hidden;
+}
+
+.orbit-calendar-shell .fc {
+  --fc-border-color: var(--color-border-subtle);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: color-mix(in oklab, var(--color-bg-card) 92%, var(--color-text-main));
+  --fc-neutral-text-color: var(--color-text-main);
+  --fc-button-bg-color: var(--color-accent);
+  --fc-button-border-color: color-mix(in oklab, var(--color-accent-foreground) 14%, transparent);
+  --fc-button-text-color: var(--color-accent-foreground);
+  --fc-button-hover-bg-color: color-mix(in oklab, var(--color-accent) 88%, var(--color-text-main));
+  --fc-button-hover-border-color: color-mix(in oklab, var(--color-accent-foreground) 24%, transparent);
+  --fc-button-active-bg-color: color-mix(in oklab, var(--color-accent) 78%, var(--color-text-main));
+  --fc-button-active-border-color: color-mix(in oklab, var(--color-accent-foreground) 28%, transparent);
+  --fc-event-border-color: transparent;
+  --fc-event-text-color: #ffffff;
+  color: var(--color-text-main);
+}
+
+.orbit-calendar-shell .fc .fc-toolbar {
+  margin-bottom: 1rem;
+}
+
+.orbit-calendar-shell .fc .fc-toolbar-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.orbit-calendar-shell .fc .fc-button {
+  border-radius: 0.8rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.orbit-calendar-shell .fc .fc-scrollgrid {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.orbit-calendar-shell .fc .fc-col-header-cell-cushion {
+  font-weight: 600;
+}
+
+.orbit-calendar-event {
+  border-radius: 0.75rem;
+}
+
+.orbit-calendar-event .fc-event-main {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem 0.35rem;
+  text-align: center;
+}
+
+.orbit-calendar-event .fc-event-title {
+  font-weight: 600;
+  line-height: 1.25;
+}

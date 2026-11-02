@@ -11,6 +11,8 @@ const defaultAppData = (): AppData => ({
     { id: 'math', name: 'Math', color: '#7c3aed', archived: false },
     { id: 'science', name: 'Science', color: '#0ea5e9', archived: false },
     { id: 'reading', name: 'Reading', color: '#22c55e', archived: false },
+    { id: 'history', name: 'History', color: '#f97316', archived: false },
+    { id: 'language', name: 'Language', color: '#ef4444', archived: false },
   ],
   blocks: [],
   sessions: [],

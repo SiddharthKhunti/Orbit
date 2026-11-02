@@ -23,6 +23,7 @@ const defaultAppData = (): AppData => ({
       { focus: 90, break: 15 },
     ],
     defaultPreset: 0,
+    themeMode: 'system',
   },
   timer: {
     status: 'idle',

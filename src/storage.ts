@@ -31,6 +31,7 @@ export function migrateAppData(data: Partial<AppData> | null | undefined): AppDa
         { focus: 90, break: 15 },
       ],
       defaultPreset: safeData.settings?.defaultPreset ?? 0,
+      themeMode: safeData.settings?.themeMode ?? 'system',
     },
     timer: {
       status: safeData.timer?.status ?? 'idle',

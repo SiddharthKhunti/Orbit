@@ -1,10 +1,9 @@
 import type { Block, Session } from '../types'
+import { AFTERNOON_WINDOW } from './config'
 
-const SCORE_WEIGHTS = {
-  rating: 0.5,
-  completed: 0.3,
-  focus: 0.2,
-} as const
+export const SCORE_WEIGHT_RATING = 0.5
+export const SCORE_WEIGHT_COMPLETION = 0.3
+export const SCORE_WEIGHT_FOCUS = 0.2
 
 export type ScoreWindow = { start: number | string; end: number | string }
 
@@ -32,18 +31,13 @@ function isInWindow(value: string, window?: { start: number; end: number }): boo
   return timestamp >= window.start && timestamp <= window.end
 }
 
-function sumMinutes(blocks: Block[]): number {
-  return blocks.reduce((total, block) => {
-    const start = new Date(block.start).getTime()
-    const end = new Date(block.end).getTime()
-    const duration = end - start
-
-    if (Number.isNaN(duration)) {
-      return total
-    }
-
-    return total + Math.max(0, duration / 60000)
-  }, 0)
+function toWindowForDay(referenceIso: string, window: { start: string; end: string }): ScoreWindow {
+  const reference = new Date(referenceIso)
+  const [startHour, startMinute] = window.start.split(':').map(Number)
+  const [endHour, endMinute] = window.end.split(':').map(Number)
+  const start = Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth(), reference.getUTCDate(), startHour, startMinute)
+  const end = Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth(), reference.getUTCDate(), endHour, endMinute)
+  return { start, end }
 }
 
 export function getScore(
@@ -61,15 +55,26 @@ export function getScore(
     : 0
 
   const focusMinutes = filteredSessions.reduce((total, session) => total + session.focusMinutes, 0)
-  const plannedMinutes = sumMinutes(filteredBlocks)
-  const completedRatio = plannedMinutes > 0 ? Math.min(1, focusMinutes / plannedMinutes) : 0
+  const completedCount = filteredSessions.length
+  const plannedCount = filteredBlocks.length
+  const completedRatio = plannedCount > 0 ? Math.min(1, completedCount / plannedCount) : 0
   const focusRatio = Math.min(1, focusMinutes / Math.max(dailyTargetMinutes, 1))
 
   const score =
     100 *
-    (SCORE_WEIGHTS.rating * (avgRating / 10) +
-      SCORE_WEIGHTS.completed * completedRatio +
-      SCORE_WEIGHTS.focus * focusRatio)
+    (SCORE_WEIGHT_RATING * (avgRating / 10) +
+      SCORE_WEIGHT_COMPLETION * completedRatio +
+      SCORE_WEIGHT_FOCUS * focusRatio)
 
   return Math.min(100, Math.max(0, score))
+}
+
+export function getAfternoonScore(
+  sessions: Session[],
+  blocks: Block[],
+  referenceIso: string,
+  dailyTargetMinutes = 240,
+): number {
+  const window = toWindowForDay(referenceIso, AFTERNOON_WINDOW)
+  return getScore(sessions, blocks, window, dailyTargetMinutes)
 }

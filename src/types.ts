@@ -43,6 +43,7 @@ export type Settings = {
   dailyTargetMinutes: number
   presets: { focus: number; break: number }[]
   defaultPreset: number
+  themeMode: 'system' | 'light' | 'dark'
 }
 
 export type AppData = {

@@ -1,15 +1,52 @@
 @import 'tailwindcss';
 
 :root {
-  font-family: Inter, 'Segoe UI', sans-serif;
+  --font-sans-primary: 'Saira', 'Segoe UI', sans-serif;
+  --color-bg-page: #f6eeff;
+  --color-bg-card: #ffffff;
+  --color-accent: #e0b0ff;
+  --color-accent-foreground: #7b3fbf;
+  --color-text-main: #1f2954;
+  --color-text-muted: #5b5f85;
+  --color-border-subtle: color-mix(in oklab, var(--color-text-main) 16%, transparent);
+  --color-bg-hover: color-mix(in oklab, var(--color-bg-card) 84%, var(--color-text-main));
+  --color-bg-pressed: color-mix(in oklab, var(--color-bg-card) 74%, var(--color-text-main));
+  --shadow-card: 0 12px 28px color-mix(in oklab, var(--color-text-main) 14%, transparent);
+  --space-overlay:
+    radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.24) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 80% 28%, rgba(123, 63, 191, 0.14) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 56% 76%, rgba(255, 255, 255, 0.18) 0 1.2px, transparent 2px),
+    linear-gradient(140deg, color-mix(in oklab, var(--color-bg-page) 90%, #fff) 0%, var(--color-bg-page) 100%);
   line-height: 1.5;
   font-weight: 400;
-  color: #0f172a;
-  background: #f8fafc;
+  color: var(--color-text-main);
+  background: var(--color-bg-page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@theme {
+  --font-sans: var(--font-sans-primary);
+}
+
+:root[data-theme='dark'] {
+  --color-bg-page: #141b3a;
+  --color-bg-card: #1f2954;
+  --color-accent: #b58cff;
+  --color-accent-foreground: #1f2954;
+  --color-text-main: #edebff;
+  --color-text-muted: #9aa3d1;
+  --color-border-subtle: color-mix(in oklab, var(--color-text-main) 22%, transparent);
+  --color-bg-hover: color-mix(in oklab, var(--color-bg-card) 82%, var(--color-text-main));
+  --color-bg-pressed: color-mix(in oklab, var(--color-bg-card) 74%, var(--color-text-main));
+  --shadow-card: 0 12px 28px color-mix(in oklab, #020617 44%, transparent);
+  --space-overlay:
+    radial-gradient(circle at 14% 18%, rgba(181, 140, 255, 0.12) 0 1.2px, transparent 2px),
+    radial-gradient(circle at 72% 26%, rgba(255, 255, 255, 0.14) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 45% 78%, rgba(181, 140, 255, 0.1) 0 1px, transparent 1.8px),
+    linear-gradient(140deg, color-mix(in oklab, var(--color-bg-page) 95%, #0f172a) 0%, var(--color-bg-page) 100%);
 }
 
 html,
@@ -22,7 +59,83 @@ body,
 
 body {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  font-family: var(--font-sans-primary);
+  color: var(--color-text-main);
+  background: var(--space-overlay);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button,
+.logo-text,
+.fc .fc-col-header-cell-cushion,
+.fc .fc-timegrid-axis-cushion,
+.fc .fc-timegrid-slot-label-cushion {
+  font-family: var(--font-sans-primary);
+}
+
+.timer-digits {
+  font-variant-numeric: tabular-nums;
+}
+
+.orbit-shell {
+  background-color: transparent;
+  color: var(--color-text-main);
+}
+
+.orbit-sidebar {
+  background-color: color-mix(in oklab, var(--color-bg-card) 86%, transparent);
+  border-color: var(--color-border-subtle);
+}
+
+.orbit-logo-badge {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+.orbit-tab-button {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-main);
+}
+
+.orbit-tab-button:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.orbit-tab-button-active {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+.orbit-card {
+  background-color: var(--color-bg-card);
+  border-color: var(--color-border-subtle);
+  box-shadow: var(--shadow-card);
+}
+
+.orbit-muted {
+  color: var(--color-text-muted);
+}
+
+.orbit-theme-option {
+  border-color: var(--color-border-subtle);
+  background-color: transparent;
+  color: var(--color-text-main);
+}
+
+.orbit-theme-option-active {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  border-color: color-mix(in oklab, var(--color-accent-foreground) 20%, transparent);
+}
+
+.orbit-action-button {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
 }
 
 button {

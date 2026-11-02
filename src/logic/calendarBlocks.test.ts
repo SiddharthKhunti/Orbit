@@ -44,10 +44,12 @@ describe('calendarBlocks', () => {
       title: 'Math practice',
       start,
       end,
+      manual: true,
     })
 
     expect(created.start).toBe('2026-01-10T11:00:00.000Z')
     expect(created.end).toBe('2026-01-10T11:30:00.000Z')
+    expect(created.manual).toBe(true)
 
     const resized = updateBlockTime(
       created as Block,

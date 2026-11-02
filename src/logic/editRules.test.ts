@@ -38,4 +38,10 @@ describe('editable rule', () => {
     expect(canSetBlockEnd(straddling, '2024-01-10T11:59:00Z', now, false)).toBe(false)
     expect(canSetBlockEnd(straddling, '2024-01-10T12:40:00Z', now, false)).toBe(true)
   })
+
+  it('allows setting block end in the past when unlocked', () => {
+    const now = new Date('2024-01-10T12:00:00Z')
+    const past = mkBlock('b2', '2024-01-10T10:00:00Z', '2024-01-10T11:00:00Z')
+    expect(canSetBlockEnd(past, '2024-01-10T11:30:00Z', now, true)).toBe(true)
+  })
 })

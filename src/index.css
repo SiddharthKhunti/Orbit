@@ -192,15 +192,31 @@ button {
 }
 
 .orbit-calendar-event .fc-event-main {
+  padding: 0.1rem 0.35rem;
+}
+
+.orbit-calendar-event-content {
   display: flex;
   height: 100%;
+  width: 100%;
   align-items: center;
   justify-content: center;
-  padding: 0.1rem 0.35rem;
+  gap: 0.35rem;
   text-align: center;
 }
 
-.orbit-calendar-event .fc-event-title {
+.orbit-calendar-event .fc-event-title,
+.orbit-calendar-event-content {
   font-weight: 600;
   line-height: 1.25;
+}
+
+.orbit-calendar-manual-badge {
+  border-radius: 999px;
+  background-color: color-mix(in oklab, #111827 25%, transparent);
+  padding: 0.08rem 0.4rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }

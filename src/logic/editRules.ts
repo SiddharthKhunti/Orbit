@@ -61,6 +61,10 @@ export function canSetBlockEnd(block: Block, nextEndIso: string, now: Date, unlo
     return false
   }
 
+  if (unlocked) {
+    return true
+  }
+
   return parseIso(nextEndIso) > now.getTime()
 }
 

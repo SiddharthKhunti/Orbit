@@ -23,6 +23,7 @@ type NewBlockInput = {
   title: string
   start: Date
   end: Date
+  manual?: boolean
 }
 
 export function createPlannedBlock(input: NewBlockInput): Block {
@@ -33,6 +34,7 @@ export function createPlannedBlock(input: NewBlockInput): Block {
     start: input.start.toISOString(),
     end: input.end.toISOString(),
     kind: 'planned',
+    manual: input.manual,
   }
 }
 

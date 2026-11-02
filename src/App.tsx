@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 
 import CalendarTab from './components/CalendarTab'
+import HomeTab from './components/HomeTab'
 import { useAppStore } from './store'
 import type { AppTab } from './types'
 
@@ -154,6 +155,8 @@ function App() {
 
         {activeTab === 'calendar' ? (
           <CalendarTab />
+        ) : activeTab === 'home' ? (
+          <HomeTab />
         ) : (
           <section className="orbit-card rounded-[28px] border p-6">
             <p className="orbit-muted max-w-2xl text-base">{tabCopy[activeTab].body}</p>

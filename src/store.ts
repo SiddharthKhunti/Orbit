@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 
+import { DEFAULT_SUBJECT_COLORS } from './logic/config'
 import { createStorage } from './storage'
 import type { AppData, AppTab } from './types'
 
@@ -8,11 +9,11 @@ const storage = createStorage()
 const defaultAppData = (): AppData => ({
   schemaVersion: 1,
   subjects: [
-    { id: 'math', name: 'Math', color: '#7c3aed', archived: false },
-    { id: 'science', name: 'Science', color: '#0ea5e9', archived: false },
-    { id: 'reading', name: 'Reading', color: '#22c55e', archived: false },
-    { id: 'history', name: 'History', color: '#f97316', archived: false },
-    { id: 'language', name: 'Language', color: '#ef4444', archived: false },
+    { id: 'math', name: 'Math', color: DEFAULT_SUBJECT_COLORS[0], archived: false },
+    { id: 'science', name: 'Science', color: DEFAULT_SUBJECT_COLORS[1], archived: false },
+    { id: 'reading', name: 'Reading', color: DEFAULT_SUBJECT_COLORS[2], archived: false },
+    { id: 'history', name: 'History', color: DEFAULT_SUBJECT_COLORS[3], archived: false },
+    { id: 'language', name: 'Language', color: DEFAULT_SUBJECT_COLORS[4], archived: false },
   ],
   blocks: [],
   sessions: [],

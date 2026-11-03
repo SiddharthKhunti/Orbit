@@ -128,10 +128,11 @@ Everything goes through one function: **`isEditable(time, now, unlocked)`**. It 
 - Default view: **week**. Switchable to **day** and **month**.
 - Dates across the top, times down the left side.
 - In day and week views: **drag to create** a block, drag to move, resize from the edges.
+- Blocks must never overlap in time. Overlapping create/move/resize attempts are rejected.
 - Click a block to open a popover: edit title, change subject, delete.
 - Block title is centered in the block and editable.
 - Block colour comes from its subject. Archived subjects keep their colour and name on existing blocks.
-- Make-up blocks use the subject colour plus a small "make-up" tag.
+- Make-up blocks use the subject colour plus a small "↻ make-up" tag.
 - Productive sessions draw a **completed overlay** (see section 11).
 
 ## 9. Home tab
@@ -202,7 +203,8 @@ score = 100 * (0.5 * avgRating/10 + 0.3 * min(1, completed/planned) + 0.2 * min(
 
 ## 14. Debug helpers (development only)
 
-- "Reset today" button that clears today's blocks and sessions, for testing make-up logic repeatedly.
+- "Reset today" button that clears today's blocks and sessions, for testing make-up logic repeatedly. This control appears only in development builds.
+- Pomodoro tab includes a development-only shortcut to jump the active timer to 5 seconds remaining for quick rating-flow testing.
 
 ## 15. Required tests (Vitest)
 

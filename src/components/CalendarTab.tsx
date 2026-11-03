@@ -7,6 +7,7 @@ import type { DateSelectArg, EventDropArg, EventInput } from '@fullcalendar/core
 
 import { useMemo, useState } from 'react'
 
+import { buildCalendarEvents } from '../logic/calendarEvents'
 import {
   createPlannedBlock,
   getDefaultSubject,
@@ -16,6 +17,8 @@ import {
 } from '../logic/calendarBlocks'
 import { STEP } from '../logic/config'
 import { canSetBlockEnd, getBlockEditPolicy, isEditable } from '../logic/editRules'
+import { overlapsExisting } from '../logic/overlapsExisting'
+import { clearTodayBlocksAndSessions } from '../logic/resetToday'
 import { useAppStore } from '../store'
 import type { Block } from '../types'
 
@@ -32,6 +35,7 @@ function toTimestamp(value: string): number {
 function CalendarTab() {
   const subjects = useAppStore((state) => state.data.subjects)
   const blocks = useAppStore((state) => state.data.blocks)
+  const sessions = useAppStore((state) => state.data.sessions)
   const updateData = useAppStore((state) => state.updateData)
   const [unlocked, setUnlocked] = useState(false)
   const [blockPopover, setBlockPopover] = useState<BlockPopoverState | null>(null)
@@ -57,38 +61,18 @@ function CalendarTab() {
     return subjects.filter((subject) => !subject.archived || subject.id === activePopoverBlock.subjectId)
   }, [activePopoverBlock, subjects])
 
-  const subjectColorById = useMemo(
-    () =>
-      new Map(
-        subjects.map((subject) => [
-          subject.id,
-          { name: subject.name, color: subject.color },
-        ]),
-      ),
-    [subjects],
-  )
+  const events = useMemo<EventInput[]>(() => buildCalendarEvents(blocks, sessions, subjects), [blocks, sessions, subjects])
 
-  const events = useMemo<EventInput[]>(
-    () =>
-      blocks.map((block) => {
-        const subject = subjectColorById.get(block.subjectId)
-        const blockColor = subject?.color ?? 'var(--color-accent)'
-
-        return {
-          id: block.id,
-          title: block.title,
-          start: block.start,
-          end: block.end,
-          backgroundColor: blockColor,
-          borderColor: blockColor,
-          extendedProps: {
-            manual: block.manual ?? false,
-          },
-          classNames: ['orbit-calendar-event'],
-        }
-      }),
-    [blocks, subjectColorById],
-  )
+  const wouldOverlapExistingBlock = (start: Date, end: Date, ignoreId?: string): boolean => {
+    return overlapsExisting(
+      {
+        start: start.toISOString(),
+        end: end.toISOString(),
+      },
+      blocks,
+      ignoreId,
+    )
+  }
 
   const canApplyBlockTimeChange = (block: Block, nextStart: Date, nextEnd: Date): boolean => {
     if (!hasMinimumBlockDuration(nextStart, nextEnd)) {
@@ -124,6 +108,10 @@ function CalendarTab() {
       return false
     }
 
+    if (wouldOverlapExistingBlock(nextStart, nextEnd, block.id)) {
+      return false
+    }
+
     return true
   }
 
@@ -142,7 +130,8 @@ function CalendarTab() {
     if (
       !hasMinimumBlockDuration(selection.start, selection.end) ||
       !isEditable(selection.start.toISOString(), new Date(), unlocked) ||
-      !isEditable(selection.end.toISOString(), new Date(), unlocked)
+      !isEditable(selection.end.toISOString(), new Date(), unlocked) ||
+      wouldOverlapExistingBlock(selection.start, selection.end)
     ) {
       selection.view.calendar.unselect()
       return
@@ -224,6 +213,15 @@ function CalendarTab() {
       return
     }
 
+    if (
+      activePopoverPolicy.changeSubject &&
+      draftSubjectId !== activePopoverBlock.subjectId &&
+      overlapsExisting(activePopoverBlock, blocks, activePopoverBlock.id)
+    ) {
+      window.alert('This block currently overlaps another block. Resolve the overlap before changing subject.')
+      return
+    }
+
     updateData((current) => ({
       ...current,
       blocks: current.blocks.map((block) => {
@@ -253,6 +251,25 @@ function CalendarTab() {
     closePopover()
   }
 
+  const showResetToday = import.meta.env.DEV
+
+  const handleResetToday = () => {
+    const confirmed = window.confirm('Reset today? This will clear today\'s blocks and sessions.')
+    if (!confirmed) {
+      return
+    }
+
+    updateData((current) => {
+      const next = clearTodayBlocksAndSessions(current.blocks, current.sessions, new Date())
+      return {
+        ...current,
+        blocks: next.blocks,
+        sessions: next.sessions,
+      }
+    })
+    closePopover()
+  }
+
   return (
     <section className="orbit-card orbit-calendar-shell rounded-[28px] border p-4">
       <FullCalendar
@@ -263,11 +280,19 @@ function CalendarTab() {
             text: unlocked ? 'Unlocked' : 'Locked',
             click: handleToggleUnlock,
           },
+          ...(showResetToday
+            ? {
+                resetToday: {
+                  text: 'Reset today',
+                  click: handleResetToday,
+                },
+              }
+            : {}),
         }}
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
-          right: 'unlockToggle timeGridDay,timeGridWeek,dayGridMonth',
+          right: `${showResetToday ? 'resetToday ' : ''}unlockToggle timeGridDay,timeGridWeek,dayGridMonth`,
         }}
         views={{
           timeGridDay: { buttonText: 'Day' },
@@ -277,6 +302,7 @@ function CalendarTab() {
         events={events}
         selectable
         selectMirror
+        selectOverlap={false}
         select={handleSelect}
         selectAllow={(selection) => {
           const now = new Date()
@@ -284,10 +310,13 @@ function CalendarTab() {
             !selection.allDay &&
             hasMinimumBlockDuration(selection.start, selection.end) &&
             isEditable(selection.start.toISOString(), now, unlocked) &&
-            isEditable(selection.end.toISOString(), now, unlocked)
+            isEditable(selection.end.toISOString(), now, unlocked) &&
+            !wouldOverlapExistingBlock(selection.start, selection.end)
           )
         }}
         editable
+        eventOverlap={false}
+        slotEventOverlap={false}
         eventAllow={(dropInfo, draggedEvent) => {
           if (!draggedEvent) {
             return false
@@ -320,7 +349,10 @@ function CalendarTab() {
         eventContent={(content) => (
           <div className="orbit-calendar-event-content">
             <span>{content.event.title}</span>
-            {content.event.extendedProps.manual ? (
+            {content.event.extendedProps.isCompletedOverlay ? null : content.event.extendedProps.isMakeup ? (
+              <span className="orbit-calendar-makeup-badge">↻ make-up</span>
+            ) : null}
+            {content.event.extendedProps.isCompletedOverlay ? null : content.event.extendedProps.manual ? (
               <span className="orbit-calendar-manual-badge">manual</span>
             ) : null}
           </div>

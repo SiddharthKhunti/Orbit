@@ -1,5 +1,6 @@
 import type { Block } from '../types'
 import { DAY_END, END_OF_DAY_BUFFER_MIN, GAP_MAX_FRACTION, PASS_RATING, PENALTY_PCT, STEP } from './config'
+import { overlapsExisting } from './overlapsExisting'
 import { roundDuration } from './roundDuration'
 
 const MINUTES_PER_DAY = 24 * 60
@@ -197,10 +198,20 @@ function placeAtEndOfDay(
   const ranges = toRanges(blocks, exceptBlockId)
   const dayRanges = ranges.filter((range) => range.start < dayEndTs && range.end > dayStartTs)
   const lastEnd = dayRanges.reduce((max, range) => Math.max(max, range.end), dayStartTs)
-  const startAt = snapUpToStep(lastEnd + END_OF_DAY_BUFFER_MIN * 60_000)
+  const startAt = findFirstFreeSlot(ranges, snapUpToStep(lastEnd + END_OF_DAY_BUFFER_MIN * 60_000), makeupMinutes)
   const endAt = startAt + makeupMinutes * 60_000
 
-  if (endAt <= dayEndTs) {
+  if (
+    endAt <= dayEndTs &&
+    !overlapsExisting(
+      {
+        start: toIso(startAt),
+        end: toIso(endAt),
+      },
+      blocks,
+      exceptBlockId,
+    )
+  ) {
     return { start: toIso(startAt), end: toIso(endAt), placement: 'end_of_day' }
   }
 
@@ -310,6 +321,18 @@ export function placeMakeupBlock({
       continue
     }
     if (!canRangeFit(ranges, gapStart, makeupMinutes)) {
+      continue
+    }
+    if (
+      overlapsExisting(
+        {
+          start: toIso(gapStart),
+          end: toIso(end),
+        },
+        blocks,
+        existingMakeupBlock?.id,
+      )
+    ) {
       continue
     }
 

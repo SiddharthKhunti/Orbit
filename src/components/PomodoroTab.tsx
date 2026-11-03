@@ -8,6 +8,7 @@ import {
   getTimerRemainingMs,
   type PomodoroPreset,
 } from '../logic/pomodoro'
+import { applySessionFeedback } from '../logic/sessionFeedback'
 import { useAppStore } from '../store'
 import type { Block, TimerState } from '../types'
 
@@ -299,26 +300,23 @@ function PomodoroTab({ isActive }: PomodoroTabProps) {
         }
       }
 
-      const nextSessions = [
-        ...current.sessions,
-        {
-          id: crypto.randomUUID(),
-          blockId: block.id,
-          subjectId: block.subjectId,
-          title: block.title,
-          start: new Date(startedAtTs).toISOString(),
-          end: new Date(completionTs).toISOString(),
-          focusMinutes: current.timer.focusMinutes,
-          breakMinutes: current.timer.breakMinutes,
-          rating: safeRating,
-          manual: false,
-        },
-      ]
+      const feedback = applySessionFeedback({
+        blocks: current.blocks,
+        sessions: current.sessions,
+        sourceBlock: block,
+        rating: safeRating,
+        focusMinutes: current.timer.focusMinutes,
+        breakMinutes: current.timer.breakMinutes,
+        startTs: startedAtTs,
+        endTs: completionTs,
+        dayStart: current.settings.dayStart,
+      })
 
       if (current.timer.breakMinutes > 0) {
         return {
           ...current,
-          sessions: nextSessions,
+          blocks: feedback.blocks,
+          sessions: feedback.sessions,
           timer: {
             ...current.timer,
             status: 'running',
@@ -333,10 +331,11 @@ function PomodoroTab({ isActive }: PomodoroTabProps) {
       }
 
       const nextBlock =
-        getRemainingBlockMinutes(block, new Date()) > 0 ? block : getCurrentOrNextBlock(current.blocks, new Date())
+        getRemainingBlockMinutes(block, new Date()) > 0 ? block : getCurrentOrNextBlock(feedback.blocks, new Date())
       return {
         ...current,
-        sessions: nextSessions,
+        blocks: feedback.blocks,
+        sessions: feedback.sessions,
         timer: nextBlock
           ? buildPausedFocusTimer(nextBlock, new Date(), current.timer.preset)
           : buildIdleTimer(current.timer.preset),
@@ -348,6 +347,39 @@ function PomodoroTab({ isActive }: PomodoroTabProps) {
   const activePresetLabel = `${timer.preset.focus}/${timer.preset.break}`
   const digits = toDurationLabel(remainingMs)
   const canControlTimer = Boolean(activeBlock) && !timer.awaitingRating
+  const showDevJumpToCompletion = import.meta.env.DEV
+
+  const handleDevJumpToFiveSeconds = () => {
+    if (timer.awaitingRating || timer.status === 'idle') {
+      return
+    }
+
+    const nowMs = Date.now()
+    updateData((current) => {
+      if (current.timer.awaitingRating || current.timer.status === 'idle') {
+        return current
+      }
+
+      if (current.timer.status === 'running') {
+        return {
+          ...current,
+          timer: {
+            ...current.timer,
+            endTimestamp: nowMs + 5_000,
+            remainingMs: undefined,
+          },
+        }
+      }
+
+      return {
+        ...current,
+        timer: {
+          ...current.timer,
+          remainingMs: 5_000,
+        },
+      }
+    })
+  }
 
   return (
     <>
@@ -421,14 +453,26 @@ function PomodoroTab({ isActive }: PomodoroTabProps) {
               </p>
 
               <div className="mt-6 flex justify-center">
-                <button
-                  type="button"
-                  onClick={handlePauseResume}
-                  disabled={!canControlTimer}
-                  className="orbit-action-button rounded-xl border px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {timer.status === 'running' ? 'Pause' : 'Resume'}
-                </button>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handlePauseResume}
+                    disabled={!canControlTimer}
+                    className="orbit-action-button rounded-xl border px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {timer.status === 'running' ? 'Pause' : 'Resume'}
+                  </button>
+                  {showDevJumpToCompletion ? (
+                    <button
+                      type="button"
+                      onClick={handleDevJumpToFiveSeconds}
+                      disabled={!canControlTimer}
+                      className="rounded-xl border px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Jump to 5s
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </>
           ) : (

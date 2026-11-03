@@ -226,3 +226,26 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+
+.orbit-calendar-makeup-badge {
+  border-radius: 999px;
+  background-color: color-mix(in oklab, #ffffff 28%, transparent);
+  padding: 0.08rem 0.4rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+
+.orbit-calendar-completed-overlay {
+  z-index: 4;
+  opacity: 0.95;
+}
+
+.orbit-calendar-completed-overlay .fc-event-main {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}

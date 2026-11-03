@@ -13,5 +13,6 @@ export const GAP_MAX_FRACTION = 0.25
 export const END_OF_DAY_BUFFER_MIN = 15
 export const DAY_END = '24:00'
 export const AFTERNOON_WINDOW = { start: '12:00', end: '18:00' }
+export const POMODORO_UI_TICK_MS = 250
 
 export const DEFAULT_SUBJECT_COLORS = ['#5b21b6', '#1d4ed8', '#0369a1', '#be123c', '#c2410c']

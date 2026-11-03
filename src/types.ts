@@ -34,8 +34,13 @@ export type TimerState = {
   blockId: string | null
   preset: { focus: number; break: number }
   phase: 'focus' | 'break'
+  focusMinutes: number
+  breakMinutes: number
   endTimestamp?: number
   remainingMs?: number
+  focusStartedAt?: number
+  focusCompletedAt?: number
+  awaitingRating?: boolean
 }
 
 export type Settings = {

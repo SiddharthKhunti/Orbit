@@ -33,6 +33,8 @@ const defaultAppData = (): AppData => ({
     blockId: null,
     preset: { focus: 25, break: 5 },
     phase: 'focus',
+    focusMinutes: 0,
+    breakMinutes: 0,
   },
 })
 

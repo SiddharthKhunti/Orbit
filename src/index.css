@@ -82,6 +82,12 @@ button,
   font-variant-numeric: tabular-nums;
 }
 
+.timer-digit-box {
+  font-variant-numeric: tabular-nums;
+  border-color: var(--color-border-subtle);
+  background-color: color-mix(in oklab, var(--color-bg-card) 86%, var(--color-text-main));
+}
+
 .orbit-shell {
   background-color: transparent;
   color: var(--color-text-main);

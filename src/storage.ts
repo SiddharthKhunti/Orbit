@@ -41,8 +41,13 @@ export function migrateAppData(data: Partial<AppData> | null | undefined): AppDa
         break: safeData.timer?.preset?.break ?? 5,
       },
       phase: safeData.timer?.phase ?? 'focus',
+      focusMinutes: safeData.timer?.focusMinutes ?? 0,
+      breakMinutes: safeData.timer?.breakMinutes ?? 0,
       endTimestamp: safeData.timer?.endTimestamp,
       remainingMs: safeData.timer?.remainingMs,
+      focusStartedAt: safeData.timer?.focusStartedAt,
+      focusCompletedAt: safeData.timer?.focusCompletedAt,
+      awaitingRating: safeData.timer?.awaitingRating ?? false,
     },
   }
 }
